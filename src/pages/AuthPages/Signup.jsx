@@ -13,7 +13,7 @@ import Swal from "sweetalert2";
 export default function Signup() {
   const dispatch = useDispatch();
   const loader = useSelector((state) => state.auth.isLoading);
-  console.log(loader);
+  const errorCatch = useSelector((state)=>state.auth.error)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -37,12 +37,6 @@ export default function Signup() {
           formData.name,
           dispatch
         );
-        await Swal.fire({
-          icon: "success",
-          title: "User Created Successfully!",
-          text: "The user has been successfully created. Thank you for signing up!",
-          confirmButtonColor: "#3085d6",
-        });
         setFormData({
           name: "",
           email: "",
