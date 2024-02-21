@@ -44,8 +44,12 @@ export default function Accounts() {
     const savingAccount = reduxAccounts.find(
       (acc) => acc.data.accountName === "Saving"
     );
-    setCashAmount(cashAccount.data.amount);
-    setSavingAmount(savingAccount.data.amount);
+    if (cashAccount) {
+      setCashAmount(cashAccount.data.amount);
+    }
+    if (savingAccount) {
+      setSavingAmount(savingAccount.data.amount);
+    }
 
     const bankTotalAmount = reduxAccounts.reduce((total, acc) => {
       if (

@@ -7,23 +7,34 @@ import {
   doc,
   query,
   where,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
-import { createAccounts, deleteAccount , updateAccount} from "../redux/slices/account";
+import {
+  createAccounts,
+  deleteAccount,
+  updateAccount,
+} from "../redux/slices/account";
 import { userId } from "../utils";
 
-const id = await userId();
-let accountsCollection;
+let accountsCollection; // Declare accountsCollection globally
 
-if (id !== null) {
-  accountsCollection = collection(db, "users", id, "accounts");
-} else {
-  // Handle the case when userId returns null
-  console.error("User ID is null");
+async function setAccountsCollection() {
+  try {
+    const id = await userId();
+    if (id !== null) {
+      accountsCollection = collection(db, "users", id, "accounts");
+    } else {
+      console.error("User ID is null");
+    }
+  } catch (error) {
+    console.error("Error setting accounts collection:", error);
+  }
 }
+setAccountsCollection();
 
 export const AddAccount = async (name, amount, dispatch) => {
   try {
+    setAccountsCollection();
     const accountObj = {
       accountName: name,
       amount: amount,
@@ -57,6 +68,7 @@ export const getAllAccounts = async (id) => {
 
 export const accountDelete = async (id, dispatch) => {
   try {
+    setAccountsCollection();
     deleteDoc(doc(accountsCollection, id));
     dispatch(deleteAccount(id));
   } catch (error) {
@@ -64,7 +76,13 @@ export const accountDelete = async (id, dispatch) => {
   }
 };
 
-export const updateAccountAmount = async (accountName, amountToUpdate, selectedMethod, dispatch) => {
+export const updateAccountAmount = async (
+  accountName,
+  amountToUpdate,
+  selectedMethod,
+  dispatch
+) => {
+  await setAccountsCollection();
   const q = query(accountsCollection, where("accountName", "==", accountName));
   let updateSuccess = true;
   try {
@@ -90,7 +108,9 @@ export const updateAccountAmount = async (accountName, amountToUpdate, selectedM
       // Update the account with the new amount
       await updateDoc(doc.ref, { amount: updatedAmount });
       await dispatch(updateAccount({ id: accountId, amount: updatedAmount }));
-      console.log(`Account ${accountName} updated with amount: ${updatedAmount}`);
+      console.log(
+        `Account ${accountName} updated with amount: ${updatedAmount}`
+      );
     }
   } catch (error) {
     console.error("Error updating account amount:", error);
@@ -99,4 +119,3 @@ export const updateAccountAmount = async (accountName, amountToUpdate, selectedM
 
   return updateSuccess; // Return the update success status after the loop
 };
-

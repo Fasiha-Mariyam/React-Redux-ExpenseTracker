@@ -16,18 +16,25 @@ import {
 } from "../redux/slices/transaction";
 import { userId } from "../utils";
 
-const id = await userId();
-let transactionsCollection;
+let transactionsCollection; // Declare accountsCollection globally
 
-if (id !== null) {
-  transactionsCollection = collection(db, "users", id, "transactions");
-} else {
-  // Handle the case when userId returns null
-  console.error("User ID is null");
+async function setTransactionCollection() {
+  try {
+    const id = await userId();
+    if (id !== null) {
+      transactionsCollection = collection(db, "users", id, "transactions");
+    } else {
+      console.error("User ID is null");
+    }
+  } catch (error) {
+    console.error("Error setting accounts collection:", error);
+  }
 }
+setTransactionCollection();
 
 export const addTransactions = async (transactionArray, dispatch) => {
   try {
+    setTransactionCollection()
     const docRef = await addDoc(transactionsCollection, transactionArray);
     const transactionId = docRef.id;
     const payload = [{ id: transactionId, data: transactionArray }];
@@ -52,6 +59,7 @@ export const getTransactions = async (id) => {
 
 export const transactionDelete = async (id, dispatch) => {
   try {
+    setTransactionCollection();
     deleteDoc(doc(transactionsCollection, id));
     dispatch(deleteTransaction(id));
   } catch (error) {
@@ -62,6 +70,7 @@ export const transactionDelete = async (id, dispatch) => {
 export const getSortedTransactions = async (dispatch , id) => {
   try {
     dispatch(startLoading());
+    setTransactionCollection();
     const collectionRef = id ? collection(db, "users", id, "transactions") : transactionsCollection;
     const q = query(collectionRef, orderBy("date", "desc")); // Sort transactions by date in descending order
     const querySnapshot = await getDocs(q);
