@@ -6,14 +6,15 @@ import EmailField from "../../components/FormFields/EmailField";
 import NameField from "../../components/FormFields/NameField";
 import { SignUp } from "../../firebase/AuthFlow/Signup";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import Swal from "sweetalert2";
 
 export default function Signup() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const loader = useSelector((state) => state.auth.isLoading);
-  const errorCatch = useSelector((state)=>state.auth.error)
+  const errorCatch = useSelector((state) => state.auth.error);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -35,7 +36,8 @@ export default function Signup() {
           formData.email,
           formData.password,
           formData.name,
-          dispatch
+          dispatch,
+          navigate
         );
         setFormData({
           name: "",
@@ -45,7 +47,7 @@ export default function Signup() {
       } else {
         Swal.fire("Password Must Be Greater Than 6 Letters!");
       }
-    } catch (error ) {
+    } catch (error) {
       console.error("Error signing up:", error.message);
     }
   };
@@ -70,7 +72,18 @@ export default function Signup() {
         <br />
         <PasswordField value={formData.password} onChange={handleChange} />
         <br /> <br />
-        <Button type="submit" variant="contained" color="primary">
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={loader}
+          sx={{
+            "&.Mui-disabled": {
+              backgroundColor: "white", // Maintain white background color when disabled
+              color: "rgba(0, 0, 0, 0.26)", // Adjust text color when disabled
+            },
+          }}
+        >
           {loader ? <CircularProgress color="inherit" size={24} /> : "Signup"}
         </Button>
       </form>
@@ -78,7 +91,12 @@ export default function Signup() {
       Already have an account?
       <Link
         to="/login"
-        style={{ textDecoration: "none", marginLeft: 5, color: "black" }}
+        style={{
+          textDecoration: "none",
+          marginLeft: 5,
+          color: "white",
+          fontSize: "20px",
+        }}
       >
         <b> Log in here.</b>
       </Link>

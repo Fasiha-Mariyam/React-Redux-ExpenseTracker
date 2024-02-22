@@ -1,38 +1,66 @@
 import React, { useEffect, useState } from "react";
 import ResponsiveTable from "../../../components/Tables/TableRespnsive";
 import Selected from "../../../components/FormFields/Selected";
-import { Box , CircularProgress  } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { getSortedTransactions } from "../../../firebase/Transaction";
+import Swal from "sweetalert2";
 import { transactionDelete } from "../../../firebase/Transaction";
 
 export default function AllTransactions() {
-  const dispatch  = useDispatch()
+  const dispatch = useDispatch();
   const Loader = useSelector((state) => state.transactions.isLoading);
-  const transactions = useSelector((state)=> state.transactions.transaction)
-  const [filterValue, setFilterValue] = useState("All"); 
-  const [transformedData , setTransformedData] = useState([])
+  const transactions = useSelector((state) => state.transactions.transaction);
+  const [filterValue, setFilterValue] = useState("All");
+  const [transformedData, setTransformedData] = useState([]);
   const [sortedTransactions, setSortedTransactions] = useState([]);
 
-  
   const handleDelete = (id) => {
+    const swalWithMuiButtons = Swal.mixin({});
+  
+    swalWithMuiButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        try {
+          if (result.isConfirmed) {
+            await transactionDelete(id, dispatch);
+            const updatedTransactions = transactions.filter(
+              (transaction) => transaction.id !== id
+            );
+            setSortedTransactions(updatedTransactions);
+            swalWithMuiButtons.fire({
+              title: "Deleted!",
+              text: "Your transaction has been deleted.",
+              icon: "success",
+            });
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            swalWithMuiButtons.fire({
+              title: "Cancelled",
+              text: "Your transaction is safe :)",
+              icon: "info",
+            });
+          }
+        } catch (error) {
+          console.error("Error deleting transaction:", error);
+          swalWithMuiButtons.fire({
+            title: "Error",
+            text: "An error occurred while deleting the transaction.",
+            icon: "error",
+          });
+        }
+      });
+  
     console.log("Deleting row with ID:", id);
-    transactionDelete(id , dispatch)
-    const updatedTransactions = transactions.filter(transaction => transaction.id !== id);
-    setSortedTransactions(updatedTransactions);
   };
-  // useEffect(() => {
-  //   async function fetchTransactions() {
-  //     try {
-  //       const sortedTransactions = await getSortedTransactions(dispatch);
-  //       setSortedTransactions(sortedTransactions);
-  //     } catch (error) {
-  //       console.error("Error fetching transactions:", error);
-  //     }
-  //   }
-
-  //   fetchTransactions();
-  // }, [dispatch]);
 
   const handleFilterChange = (value) => {
     setFilterValue(value);
@@ -85,22 +113,29 @@ export default function AllTransactions() {
         />
       </Box>
       {Loader ? (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "50vh" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh",
+          }}
+        >
           <CircularProgress />
         </Box>
+      ) : transformedData.length === 0 ? (
+        <h3
+          style={{ display: "flex", justifyContent: "center", color: "blue" }}
+        >
+          No transactions to display.
+        </h3>
       ) : (
-        transformedData.length === 0 ? (
-          <h3 style={{ display: "flex", justifyContent: "center", color: "blue" }}>
-            No transactions to display.
-          </h3>
-        ) : (
-          <ResponsiveTable
-            data={transformedData}
-            handleDelete={handleDelete}
-            columns={["Account", "Amount", "Type", "Date", "Category", "Remove"]}
-            rowsPerPageOptions={[5, 10, 15]}
-          />
-        )
+        <ResponsiveTable
+          data={transformedData}
+          handleDelete={handleDelete}
+          columns={["Account", "Amount", "Type", "Date", "Category", "Remove"]}
+          rowsPerPageOptions={[5, 10, 15]}
+        />
       )}
     </>
   );

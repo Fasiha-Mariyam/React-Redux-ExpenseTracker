@@ -4,7 +4,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import Swal from "sweetalert2";
 
-export const SignUp = async (email, password, name, dispatch) => {
+export const SignUp = async (email, password, name, dispatch , navigate) => {
   try {
     dispatch(startLoading())
     console.log(name, email, password);
@@ -56,6 +56,7 @@ export const SignUp = async (email, password, name, dispatch) => {
         text: "The user has been successfully created. Thank you for signing up!",
         confirmButtonColor: "#3085d6",
       });
+      navigate('/login');
       dispatch(getSignUp({ name, email, id: userRef.id }));
       
     }

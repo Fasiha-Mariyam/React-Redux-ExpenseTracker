@@ -8,9 +8,11 @@ import { addTransactions } from "../../../firebase/Transaction";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { updateAccountAmount } from "../../../firebase/Account";
+import { useNavigate } from "react-router-dom";
 
 export default function AddTransaction() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -27,7 +29,7 @@ export default function AddTransaction() {
   const [amount, setAmount] = useState({ amount: "" });
   // date state
   const [dateValue, setDateValue] = useState("");
-  
+
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -68,7 +70,7 @@ export default function AddTransaction() {
 
   async function handleAddTransactions() {
     let payload = null;
-  
+
     if (amount.amount === "" || accountValue === "" || dateValue === "") {
       console.log("Fill All the Required Fields First");
       setSnackbarMessage("Fill All the Required Fields First");
@@ -76,14 +78,14 @@ export default function AddTransaction() {
       setSnackbarOpen(true);
       return;
     }
-  
+
     if (selectedMethod === "") {
       setSnackbarMessage("Select Method To Proceed");
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
       return;
     }
-  
+
     if (selectedMethod === "Expense" && categoryValue === "") {
       console.log("Fill Category Field for Expense");
       setSnackbarMessage("Fill Category Field for Expense");
@@ -91,8 +93,13 @@ export default function AddTransaction() {
       setSnackbarOpen(true);
       return;
     }
-  
-    const updateSuccess = await updateAccountAmount(accountValue, amount.amount, selectedMethod, dispatch);
+
+    const updateSuccess = await updateAccountAmount(
+      accountValue,
+      amount.amount,
+      selectedMethod,
+      dispatch
+    );
     console.log(updateSuccess);
     if (!updateSuccess) {
       // If update failed due to insufficient balance
@@ -101,7 +108,7 @@ export default function AddTransaction() {
       setSnackbarOpen(true);
       return;
     }
-  
+
     if (selectedMethod === "Income") {
       payload = {
         type: selectedMethod,
@@ -119,7 +126,7 @@ export default function AddTransaction() {
         date: dateValue,
       };
     }
-  
+
     addTransactions(payload, dispatch);
     setAccountValue(0);
     setCategoryValue(0);
@@ -129,8 +136,10 @@ export default function AddTransaction() {
     setSnackbarMessage("Transaction Completed Successfully.");
     setSnackbarSeverity("success");
     setSnackbarOpen(true);
+    setTimeout(() => {
+      navigate("/allTransaction");
+    }, 1000);
   }
-  
 
   return (
     <Box
@@ -185,6 +194,7 @@ export default function AddTransaction() {
               type="date"
               value={dateValue}
               onChange={(e) => setDateValue(e.target.value)}
+              inputProps={{ max: new Date().toISOString().split("T")[0] }} //("2024-02-23T10:30:00Z")split T.
             />
           </Box>
         </Box>

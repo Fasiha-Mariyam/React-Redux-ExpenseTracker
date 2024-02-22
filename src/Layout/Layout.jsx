@@ -1,8 +1,8 @@
 import { useLocation } from "react-router-dom";
-import { logOut } from "../../redux/store";
+import { logOut } from "../redux/store";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import SideBar from "./SideBar";
+import SideBar from "../components/Layout/SideBar";
 
 const Layout = ({ children }) => {
   const location = useLocation();

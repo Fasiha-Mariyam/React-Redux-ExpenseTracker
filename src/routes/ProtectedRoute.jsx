@@ -16,7 +16,6 @@ export default function ProtectedRoute({Component}) {
       }
         else {
           setLoader(false);
-          // navigate('/');
         }
       
     };

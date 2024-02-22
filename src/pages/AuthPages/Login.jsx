@@ -58,7 +58,18 @@ export default function Login() {
         <br /> <br />
         <PasswordField value={formData.password} onChange={handleChange} />
         <br /> <br />
-        <Button type="submit" variant="contained" color="primary">
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={loader}
+          sx={{
+            "&.Mui-disabled": {
+              backgroundColor: "white", // Maintain white background color when disabled
+              color: "rgba(0, 0, 0, 0.26)", // Adjust text color when disabled
+            },
+          }}
+        >
           {loader ? <CircularProgress color="inherit" size={24} /> : "Login"}
         </Button>
       </form>
@@ -66,14 +77,25 @@ export default function Login() {
       New to our platform?
       <Link
         to="/"
-        style={{ textDecoration: "none", marginLeft: 5, color: "black" }}
+        style={{
+          textDecoration: "none",
+          marginLeft: 5,
+          color: "white",
+          fontSize: "20px",
+        }}
       >
         <b> Sign up now!</b>
       </Link>
-      <br /><br />
+      <br />
+      <br />
       <Link
         to="/forgetPassword"
-        style={{ textDecoration: "none", marginLeft: 5, color: "black" }}
+        style={{
+          textDecoration: "none",
+          marginLeft: 5,
+          color: "white",
+          fontSize: "20px",
+        }}
       >
         <b> Forget Password?</b>
       </Link>

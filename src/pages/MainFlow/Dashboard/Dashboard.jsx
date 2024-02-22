@@ -51,21 +51,10 @@ export default function Dashboard() {
 
   return (
     <>
-      {Loader ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh",
-          }}
-        >
-          <CircularProgress />
-        </div>
-      ) : (
-        <div style={{ padding: "0 20px", marginTop: "20px" }}>
-          <Grid container justifyContent="space-between" spacing={2}>
-            {/* First Grid item for the DonutChart */}
+      <div style={{ padding: "0 20px", marginTop: "20px" }}>
+        <Grid container justifyContent="space-between" spacing={2}>
+          {/* First Grid item for the DonutChart */}
+          {!Loader && (totalIncome > 0 || totalExpense > 0) && (
             <Grid
               item
               xs={12}
@@ -81,7 +70,10 @@ export default function Dashboard() {
                 />
               </div>
             </Grid>
-            {/* Second Grid item for the "Add More" button */}
+          )}
+
+          {/* Second Grid item for the "BalanceCard" */}
+          {totalIncome > 0 || totalExpense > 0 ? (
             <Grid
               item
               xs={12}
@@ -90,11 +82,12 @@ export default function Dashboard() {
               lg={4}
               style={{
                 display: "flex",
-                justifyContent: "flex-end",
+                justifyContent: "center", // Center horizontally
+                alignItems: "center", // Center vertically
                 marginBottom: "20px",
               }}
             >
-              <div style={{ flex: 1, textAlign: "right" }}>
+              <div>
                 <BalanceCard
                   Amount={totalAmount + " Pkr"}
                   ExpenseTotal={totalExpense}
@@ -102,9 +95,31 @@ export default function Dashboard() {
                 />
               </div>
             </Grid>
-          </Grid>
-        </div>
-      )}
+          ) : (
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={12} // Make it full width on small screens
+              lg={12} // Make it full width on large screens
+              style={{
+                display: "flex",
+                justifyContent: "center", // Center horizontally
+                alignItems: "center", // Center vertically
+                marginBottom: "20px",
+              }}
+            >
+              <div>
+                <BalanceCard
+                  Amount={totalAmount + " Pkr"}
+                  ExpenseTotal={totalExpense}
+                  IncomeTotal={totalIncome}
+                />
+              </div>
+            </Grid>
+          )}
+        </Grid>
+      </div>
 
       {/* recent transactions */}
       {!Loader && (
@@ -118,7 +133,7 @@ export default function Dashboard() {
           <Grid container justifyContent="space-between">
             <Typography variant="h4">Recent Transactions</Typography>
             <Button variant="contained" onClick={handleAddMoreClick}>
-              Add More
+              Add Transactions
             </Button>
           </Grid>
           <br />
@@ -133,17 +148,19 @@ export default function Dashboard() {
           ) : (
             <p>No transactions available.</p>
           )}
-          <Grid
-            container
-            justifyContent="space-between"
-            style={{ marginTop: "20px" }}
-          >
-            <Grid item>
-              <Button variant="contained" onClick={handleSeeMoreClick}>
-                See More
-              </Button>
+          {firstThreeTransactions.length > 0 && (
+            <Grid
+              container
+              justifyContent="space-between"
+              style={{ marginTop: "20px" }}
+            >
+              <Grid item>
+                <Button variant="contained" onClick={handleSeeMoreClick}>
+                  See More
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
+          )}
         </div>
       )}
     </>

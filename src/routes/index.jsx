@@ -8,8 +8,8 @@ import Accounts from "../pages/MainFlow/Accounts/Accounts";
 import AddCategory from "../pages/MainFlow/Categories/AddCategory";
 import AddTransaction from "../pages/MainFlow/Transactions/AddTransaction";
 import AllTransactions from "../pages/MainFlow/Transactions/AllTransactions";
-import Layout from "../components/Layout/Layout";
 import ForgetPassword from "../pages/AuthPages/ForgetPassword";
+import Layout from "../Layout/Layout";
 
 export default function RouteIndex() {
 
