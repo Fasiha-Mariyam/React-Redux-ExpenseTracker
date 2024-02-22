@@ -1,27 +1,24 @@
 import TableCard from "../../../components/Card/TableCard";
 import { Grid, Button, Typography, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import DonutChart from "../../../components/Chart/DonutChart";
-import { useState, useEffect } from "react";
 import BalanceCard from "../../../components/Card/BalanceCard";
-import { getSortedTransactions } from "../../../firebase/Transaction";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const Loader = useSelector((state) => state.transactions.isLoading);
   const transactions = useSelector((state) => state.transactions.transaction);
-  const firstThreeTransactions = transactions.slice(0,3);
+  const account = useSelector((state) => state.account.account);
+  const amountOfAccounts = account.map((amount) => {
+    return amount.data.amount;
+  });
+  const firstThreeTransactions = transactions.slice(0, 3);
 
   // total amount
-  const totalAmount = transactions.reduce(
-    (accumulator, currentTransaction) => {
-      const transactionAmount = parseFloat(currentTransaction.data.amount);
-      return accumulator + transactionAmount;
-    },
-    0
-  );
+  const totalAmount = amountOfAccounts.reduce((accumulator, currentAmount) => {
+    return accumulator + parseFloat(currentAmount);
+  }, 0);
 
   // total Income
   const totalIncome = transactions.reduce((accumulator, currentTransaction) => {
@@ -55,9 +52,16 @@ export default function Dashboard() {
   return (
     <>
       {Loader ? (
-       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-       <CircularProgress />
-     </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+          }}
+        >
+          <CircularProgress />
+        </div>
       ) : (
         <div style={{ padding: "0 20px", marginTop: "20px" }}>
           <Grid container justifyContent="space-between" spacing={2}>

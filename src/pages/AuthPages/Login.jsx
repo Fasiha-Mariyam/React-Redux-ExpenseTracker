@@ -13,7 +13,6 @@ export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const loader = useSelector((state) => state.auth.isLoading);
-  const error = useSelector((state) => state.auth.hasError);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
